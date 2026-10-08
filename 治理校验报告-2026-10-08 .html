@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>治理合规校验报告</title>
+<style>
+  body { font-family: 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif; margin: 32px auto; max-width: 1100px; color: #1f2328; font-size: 14px; line-height: 1.6; }
+  h1 { font-size: 22px; border-bottom: 2px solid #1d4ed8; padding-bottom: 10px; }
+  .summary { color: #424a53; margin: 12px 0 20px; }
+  .lv-summary { display: flex; gap: 10px; margin: -8px 0 20px; flex-wrap: wrap; }
+  .lv-summary span { display: inline-block; padding: 3px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+  .lv-summary .error { background: #fdecec; color: #cd2b31; }
+  .lv-summary .warning { background: #fdf3e7; color: #b45a00; }
+  .lv-summary .info { background: #e8effc; color: #1d4ed8; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 28px; font-size: 13px; }
+  th, td { border: 1px solid #e2e5ea; padding: 7px 10px; text-align: left; }
+  th { background: #f3f4f7; font-weight: 600; }
+  .num { text-align: right; }
+  .file-block { margin: 16px 0; border: 1px solid #e2e5ea; border-radius: 6px; padding: 12px 16px; }
+  .file-block h3 { margin: 0 0 8px; font-size: 14px; }
+  .count { color: #8a919c; font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .item { padding: 6px 0; border-top: 1px solid #eceef1; }
+  .lv { display: inline-block; min-width: 56px; text-align: center; font-weight: 600; font-size: 12px; padding: 1px 8px; border-radius: 7px; box-sizing: border-box; }
+  .lv.error { color: #cd2b31; background: #fdecec; }
+  .lv.warning { color: #b45a00; background: #fdf3e7; }
+  .lv.info { color: #1d4ed8; background: #e8effc; }
+  .rule { color: #424a53; font-size: 12px; margin-left: 8px; font-family: 'SF Mono', Menlo, monospace; }
+  .times { display: inline-block; margin-left: 6px; padding: 0 6px; background: #eef0f3; border-radius: 8px; font-size: 11px; color: #424a53; }
+  .msg { margin-top: 2px; }
+  .filters { display: flex; gap: 8px; margin: 0 0 14px; flex-wrap: wrap; }
+  .filter { border: 1px solid #e2e5ea; background: #fff; border-radius: 10px; padding: 4px 14px; font-size: 13px; cursor: pointer; color: #424a53; }
+  .filter:hover { border-color: #1d4ed8; }
+  .filter.active { background: #1d4ed8; border-color: #1d4ed8; color: #fff; font-weight: 600; }
+  .item.hidden { display: none; }
+  .file-block.empty { display: none; }
+</style>
+</head>
+<body>
+  <h1>治理合规校验报告</h1>
+  <div class="summary">扫描 100 个文件 · 耗时 3.3s · 2026/10/8 16:46:23</div>
+  <div class="lv-summary">
+    
+    <span class="warning">WARNING 112 条 · 41 文件</span>
+    <span class="info">INFO 117 条 · 32 文件</span>
+  </div>
+  <h2>规则汇总</h2>
+  <table>
+    <thead><tr><th>类别</th><th>规则</th><th>等级</th><th>生效范围</th><th>规则描述</th><th>问题数</th><th>涉及文件</th></tr></thead>
+    <tbody><tr>
+          <td>R3</td>
+          <td>jinja.missing-macro</td>
+          <td><span class="lv warning">WARNING</span></td>
+          <td>feature</td>
+          <td>R3 模板含缺失宏标记（MISSING_MACRO）</td>
+          <td class="num">100</td>
+          <td class="num">35</td>
+        </tr><tr>
+          <td>R2</td>
+          <td>examples.chinese-value</td>
+          <td><span class="lv info">INFO</span></td>
+          <td>feature</td>
+          <td>R2 examples 取值包含中文</td>
+          <td class="num">88</td>
+          <td class="num">17</td>
+        </tr><tr>
+          <td>R4</td>
+          <td>content.manual-review</td>
+          <td><span class="lv info">INFO</span></td>
+          <td>feature</td>
+          <td>R4 含需人工介入的描述（USCDB MML 命令界面操作）</td>
+          <td class="num">21</td>
+          <td class="num">21</td>
+        </tr><tr>
+          <td>R3</td>
+          <td>jinja.getvalue-switch-semantics</td>
+          <td><span class="lv warning">WARNING</span></td>
+          <td>feature</td>
+          <td>R3 getValueList 守卫取值口径提示</td>
+          <td class="num">12</td>
+          <td class="num">8</td>
+        </tr><tr>
+          <td>R3</td>
+          <td>jinja.custom-usage</td>
+          <td><span class="lv info">INFO</span></td>
+          <td>feature</td>
+          <td>R3 模板使用自定义开关/函数（非 YAML 参数）</td>
+          <td class="num">8</td>
+          <td class="num">8</td>
+        </tr></tbody>
+  </table>
+  <h2>违规明细（按文件）</h2>
+  <div class="filters" id="filters">
+    <button class="filter active" data-lv="" onclick="applyFilter('')">所有 229 条</button>
+    
+    <button class="filter" data-lv="WARNING" onclick="applyFilter('WARNING')">WARNING 112 条</button>
+    <button class="filter" data-lv="INFO" onclick="applyFilter('INFO')">INFO 117 条</button>
+  </div>
+  <div class="file-block">
+        <h3>📄 UPCF/UPCF_登录与退出PGW Web LMT_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 47 行）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_检查License资源_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 34 行，共 2 处）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_检查链路_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 67 行，共 6 处）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置ClickHouse TLS数字证书_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 44 行）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_大颗粒服务证书同步_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">jinja.custom-usage</span>
+          
+          <div class="msg">feature jinja 使用自定义函数: name=getValueList</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('LST CERSCENE') 变量 LST_CERSCENE 用于裸真值判断（{% if LST_CERSCENE %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if LST_CERSCENE and LST_CERSCENE != '0' %}</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('LST CERT') 变量 LST_CERT 用于裸真值判断（{% if LST_CERT %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if LST_CERT and LST_CERT != '0' %}</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_调整内存数据库的自动备份时间_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list[0].INSPV 取值包含中文: '软件参数值'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 619 行）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置GRE VPN安全_zh-CN.md <span class="count block-count" data-total="6">6 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_gretunnel_list[0].TNLNAME 取值包含中文: '隧道名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_gretunnel_list[0].TNLTYPE 取值包含中文: '隧道类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_gretunnel_list[0].SRCTYPE 取值包含中文: '源类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_gretunnel_list[0].SRCIPADDR 取值包含中文: '源IP地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_gretunnel_list[0].DSTIPADDR 取值包含中文: '目的IP地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_gretunnel_list[0].GREKEY 取值包含中文: '识别关键字'</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置PMS服务器的接入权限_zh-CN.md <span class="count block-count" data-total="4">4 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_pmsadminip_list[0].IPID 取值包含中文: 'IP地址索引'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_pmsadminip_list[0].IP 取值包含中文: 'IPv4地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_pmsadminip_list[0].NETMASK 取值包含中文: '子网掩码'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_pmsadminip_list[0].DESCRIPTION 取值包含中文: '描述'</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置容灾局2#配置对接数据实例_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「USCDB MML命令界面」（第 736 行）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置PGW的接入权限_zh-CN.md <span class="count block-count" data-total="6">6 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_provisionip_list[0].ADDRID 取值包含中文: 'IP地址索引'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_provisionip_list[0].ADDRNAME 取值包含中文: 'IP地址名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_provisionip_list[0].IPVER 取值包含中文: 'IP类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_provisionip_list[0].IPV4ADDR 取值包含中文: 'IPV4地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_provisionip_list[0].IPTYPE 取值包含中文: 'IP地址类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 743 行）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置对接数据实例_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「USCDB MML命令界面」（第 709 行）</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD DBSRDSG list_name=add_dbsrdsg_list step_id=2.3</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD DBSRIPADDR list_name=add_dbsripaddr_list step_id=2.4</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置主用局#配置对接数据实例_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「USCDB MML命令界面」（第 715 行）</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD DBSRIPADDR list_name=add_dbsripaddr_list step_id=2.4</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置容灾局#配置对接数据实例_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「USCDB MML命令界面」（第 736 行）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置UPCF与USCDB对接数据（手动建链，单USCDB应用模式）_zh-CN.md <span class="count block-count" data-total="5">5 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rst_module_list[0].MID 取值包含中文: '模块号'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令界面」（第 81 行，共 5 处）</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">jinja.custom-usage</span>
+          
+          <div class="msg">feature jinja 使用自定义函数: name=getValueList</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('SET DBSSCTPPARA') 变量 SET_DBSSCTPPARA 用于裸真值判断（{% if SET_DBSSCTPPARA %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if SET_DBSSCTPPARA and SET_DBSSCTPPARA != '0' %}</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('SET DSGSCTPPARA') 变量 SET_DSGSCTPPARA 用于裸真值判断（{% if SET_DSGSCTPPARA %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if SET_DSGSCTPPARA and SET_DSGSCTPPARA != '0' %}</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_修改用户操作权限_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=MOD OPR list_name=mod_opr_list step_id=2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_BE倒换测试_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 164 行，共 4 处）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_启动建立基线数据_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].set_rloadcfg_list[0].RLOCID 取值包含中文: '[主用BE LocationID]'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].set_rloadcfg_list_3[0].RLOCID 取值包含中文: '[主用BE LocationID]'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 702 行，共 3 处）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_IPFD-015002_去激活支持GRE_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rmv_gretunnel_list[0].TNLNAME 取值包含中文: '隧道名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rmv_gretunnel_list[0].TNLTYPE 取值包含中文: '隧道类型'</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_IPFD-012002_去激活支持ACL6_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rmv_aclruleadv6_list[0].ACLNAME 取值包含中文: 'IPv6 ACL规则组标识'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rmv_aclruleadv6_list[0].ACLRULENAME 取值包含中文: '规则名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rmv_aclgroup6_list[0].ACLNAME 取值包含中文: 'IPv6 ACL规则组标识'</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_SFFD-106101_激活端到端用户跟踪_zh-CN.md <span class="count block-count" data-total="1">1 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=SET LICENSESWITCH list_name=set_licenseswitch_list step_id=1</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-601043_N7接口策略请求_更新_下线流程特性配置_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=8.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=8.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-608002_基于服务区的接入策略控制特性配置_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=9.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=9.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_IPFD-012002_激活支持ACL_zh-CN.md <span class="count block-count" data-total="10">10 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclgroup_list[0].ACLTYPE 取值包含中文: 'ACL规则类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_3[0].ACLICMPNAME 取值包含中文: 'ICMP名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_3[0].ACLICMPTYPE 取值包含中文: '网络控制管理协议类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_3[0].ACLICMPCODE 取值包含中文: '网络控制管理协议消息码'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_4[0].ACLSRCPORTOP 取值包含中文: '源端口范围类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_4[0].ACLSRCPORTBEGIN 取值包含中文: '源端口号开始端口号'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_4[0].ACLSRCPORTEND 取值包含中文: '源端口号结束端口号'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_4[0].ACLDESTPORTOP 取值包含中文: '目的端口范围类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_4[0].ACLDESTPORTBEGIN 取值包含中文: '目的端口号开始端口号'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_aclruleadv4_list_4[0].ACLDESTPORTEND 取值包含中文: '目的端口号结束端口号'</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611001_基于使用量的动态策略控制（调整资费）（5G）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=9.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=9.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置基础数据实例_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「USCDB MML命令界面」（第 4941 行，共 4 处）</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=USE ME list_name=use_me_list step_id=2</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD SYSNO list_name=add_sysno_list step_id=4</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置PGW与业务发放系统_OCS的对接数据_zh-CN.md <span class="count block-count" data-total="10">10 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list[0].INSPT 取值包含中文: '软件参数类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list[0].INSPN 取值包含中文: '软件参数名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list[0].INSPV 取值包含中文: '软件参数值'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].set_grantipswitch_list[0].PORTTYPE 取值包含中文: '端口类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].set_grantipswitch_list[0].SWITCH 取值包含中文: '开关'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rst_module_list[0].MEID 取值包含中文: '网元ID'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rst_module_list[0].MN 取值包含中文: '模块号'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 1415 行）</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD SYSNO list_name=add_sysno_list step_id=7.2</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD OPR list_name=add_opr_list step_id=7.3</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611004_基于PRA的动态策略控制（5G）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=9.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=9.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611003_基于假期时间段的策略控制（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=12.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=12.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_关闭_启动内存数据库自动备份功能_zh-CN.md <span class="count block-count" data-total="7">7 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list[0].INSPV 取值包含中文: '0/1（关/开）'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_1[0].INSPV 取值包含中文: '0/1（关/开）'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_2[0].INSPV 取值包含中文: '0/1（关/开）'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_3[0].INSPV 取值包含中文: '0/1（关/开）'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_4[0].INSPV 取值包含中文: '0/1（关/开）'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_5[0].INSPV 取值包含中文: '0/1（关/开）'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 26 行，共 3 处）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置BGP安全_zh-CN.md <span class="count block-count" data-total="17">17 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list[0].VRFNAME 取值包含中文: 'VPN实例名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list[0].ADDRESSTYPE 取值包含中文: '地址类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list[0].PEERADDR 取值包含中文: '对等体地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list[0].PSWDTYPE 取值包含中文: '密码类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list[0].PSWDCIPHERTEXT 取值包含中文: '密码'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list_1[0].VRFNAME 取值包含中文: 'VPN实例名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list_1[0].ADDRESSTYPE 取值包含中文: '地址类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list_1[0].PEERADDR 取值包含中文: '对等体地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list_1[0].KEYCHAINNAME 取值包含中文: 'Keychain名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list_2[0].VRFNAME 取值包含中文: 'VPN实例名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list_2[0].ADDRESSTYPE 取值包含中文: '地址类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list_2[0].PEERADDR 取值包含中文: '对等体地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeer_list_2[0].VALIDTTLHOPS 取值包含中文: '指定需要检测的TTL跳数值'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeeraf_list[0].VRFNAME 取值包含中文: 'VPN实例名称'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeeraf_list[0].AFTYPE 取值包含中文: '地址族类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeeraf_list[0].REMOTEADDRESS 取值包含中文: 'IPv4对等体地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_bgppeeraf_list[0].ROUTELIMIT 取值包含中文: '路由超限阈值'</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_从虚拟机硬盘恢复内存数据库_zh-CN.md <span class="count block-count" data-total="9">9 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_1[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_5[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rst_module_list[0].MID 取值包含中文: '模块号'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rst_module_list[0].MT 取值包含中文: '模块类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_7[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_11[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_12[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 3590 行）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611003_基于自定义时间段的策略控制（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=SET PSYSPARA list_name=set_psyspara_list step_id=11</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=12.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=12.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置UPCF与USCDB对接数据（手动建链，多USCDB应用共存模式）_zh-CN.md <span class="count block-count" data-total="5">5 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rst_module_list[0].MID 取值包含中文: '模块号'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令界面」（第 104 行，共 5 处）</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">jinja.custom-usage</span>
+          
+          <div class="msg">feature jinja 使用自定义函数: name=getValueList</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('SET DBSSCTPPARA') 变量 SET_DBSSCTPPARA 用于裸真值判断（{% if SET_DBSSCTPPARA %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if SET_DBSSCTPPARA and SET_DBSSCTPPARA != '0' %}</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('SET DSGSCTPPARA') 变量 SET_DSGSCTPPARA 用于裸真值判断（{% if SET_DSGSCTPPARA %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if SET_DSGSCTPPARA and SET_DSGSCTPPARA != '0' %}</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_从自带空间备份源恢复内存数据库_zh-CN.md <span class="count block-count" data-total="11">11 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_1[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_5[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rst_module_list[0].MID 取值包含中文: 'Master模块号'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].rst_module_list[0].MT 取值包含中文: '模块类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_7[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_11[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].mod_insp_list_12[0].FETYPEN 取值包含中文: '网元类型'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 3578 行）</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">jinja.custom-usage</span>
+          
+          <div class="msg">feature jinja 使用自定义函数: name=getValueList</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('LST INSP') 变量 LST_INSP 用显式比较判断取值（'1'）：请确认这些字面量覆盖了用户所有可能的填值（如 '0' 表示关闭）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611008_基于消费额度的动态策略控制（首次进入漫游区）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=12.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=12.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611008_基于消费额度的动态策略控制（重定向）（2G_3G）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=14.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=14.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611009_基于签约的动态策略控制特性配置（2G_3G）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=10.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=10.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611024_基于时区的动态策略控制特性配置（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=11.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=11.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611007_基于漫游区的动态策略控制（2G_3G）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=13.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=13.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611008_基于消费额度的动态策略控制（重定向）（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=14.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=14.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置UPCF与NWDAF的对接数据_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">jinja.custom-usage</span>
+          
+          <div class="msg">feature jinja 使用自定义函数: name=getValueList</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('LST NFCOMINFO') 变量 LST_NFCOMINFO 用于裸真值判断（{% if LST_NFCOMINFO %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if LST_NFCOMINFO and LST_NFCOMINFO != '0' %}</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611003_基于提前下发时间段的策略控制（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=11.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=11.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611078_WHFD-611078 基于DNN的动态策略控制特性配置_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=8.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=8.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611060_Gx增强的ADC基本功能（带宽控制）（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="4">4 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=9.2</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=9.3</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">jinja.custom-usage</span>
+          
+          <div class="msg">feature jinja 使用自定义函数: name=getValueList</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('LST PCEFABIITEM') 变量 LST_PCEFABIITEM 用显式比较判断取值（'SupportedAppDetection'）：请确认这些字面量覆盖了用户所有可能的填值（如 '0' 表示关闭）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611121_支持签约的UE Logo下发特性配置（SA，基于位置动作映射）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=9.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=9.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611121_支持签约的UE Logo下发特性配置（SA，基于基础策略）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=8.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=8.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611075_WHFD-611075 配额动态分片特性配置_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=10</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=10.1</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611020_基于滑动时间窗口的动态策略控制(时长)特性配置（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=13.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=13.2</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PACCUM list_name=add_paccum_list step_id=14</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-940050_基于会话级和业务级配额组合的策略控制（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=11.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=11.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-940060_WHFD-940060 用户通知增强-用户自定义阈值特性配置_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=10.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=10.2</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=MOD PCTLEVEL list_name=mod_pctlevel_list step_id=11</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611028_基于用户等级的小区拥塞控制（2G_3G）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=11.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=11.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-940050_基于时长与流量配额组合的策略控制（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=11.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=11.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611028_基于用户等级的小区拥塞控制（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=11.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=11.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-940010_配置用户数据导出至第三方服务器_zh-CN.md <span class="count block-count" data-total="4">4 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 656 行）</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD EXPTASK list_name=add_exptask_list step_id=5</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD EXPTASK list_name=add_exptask_list_2 step_id=5.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD EXPTASK list_name=add_exptask_list_3 step_id=5.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611062_灵活的配额转移特性配置（4G或2G_3G_4G融合组网）_zh-CN.md <span class="count block-count" data-total="3">3 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSUB list_name=add_psub_list step_id=14.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PSRV list_name=add_psrv_list step_id=14.2</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=TSF PQUOTA list_name=tsf_pquota_list step_id=15</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_WHFD-611140_NWDAF保障联动控制特性配置_zh-CN.md <span class="count block-count" data-total="28">28 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_ngactionattr_list_2[0].VALUE 取值包含中文: '保障中'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_service_list[0].DESCRIPTION 取值包含中文: '保障中logo'</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD CONDITIONGROUP list_name=add_conditiongroup_list step_id=2</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD CONDITION list_name=add_condition_list step_id=2</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD CONDITIONGROUP list_name=add_conditiongroup_list_2 step_id=3</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD CONDITION list_name=add_condition_list_4 step_id=3</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD NGACTION list_name=add_ngaction_list step_id=4</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD NGACTIONATTR list_name=add_ngactionattr_list step_id=4</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD NGACTION list_name=add_ngaction_list_2 step_id=5</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD NGACTIONATTR list_name=add_ngactionattr_list_2 step_id=5</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD NGACTION list_name=add_ngaction_list_4 step_id=6</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD NGACTIONATTR list_name=add_ngactionattr_list_6 step_id=6</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD RULE list_name=add_rule_list step_id=7</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD RULECONDITIONGROUP list_name=add_ruleconditiongroup_list step_id=7</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD RULENGACTION list_name=add_rulengaction_list step_id=7</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD RULE list_name=add_rule_list_2 step_id=8</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD RULECONDITIONGROUP list_name=add_ruleconditiongroup_list_2 step_id=8</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD RULENGACTION list_name=add_rulengaction_list_2 step_id=8</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD POLICY list_name=add_policy_list step_id=9</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD POLICYRULE list_name=add_policyrule_list step_id=9</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD POLICYTRIGGER list_name=add_policytrigger_list step_id=9</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD POLICY list_name=add_policy_list_2 step_id=10</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD POLICYRULE list_name=add_policyrule_list_2 step_id=10</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD POLICYTRIGGER list_name=add_policytrigger_list_2 step_id=10</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD SERVICE list_name=add_service_list step_id=11</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD SERVICEPOLICY list_name=add_servicepolicy_list step_id=11</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PCMCCSUB list_name=add_pcmccsub_list step_id=12.1</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD PCMCCSRV list_name=add_pcmccsrv_list step_id=12.2</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_检查容灾参数配置_zh-CN.md <span class="count block-count" data-total="4">4 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">content.manual-review</span>
+          
+          <div class="msg">含需人工介入的描述「“USCDB MML命令”界面」（第 5886 行，共 2 处）</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">jinja.custom-usage</span>
+          
+          <div class="msg">feature jinja 使用自定义函数: name=getValueList</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('LST INSP') 变量 LST_INSP 用于裸真值判断（{% if LST_INSP %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if LST_INSP and LST_INSP != '0' %}</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('LST INSP') 变量 LST_INSP 用显式比较判断取值（'0', '1', '20'）：请确认这些字面量覆盖了用户所有可能的填值（如 '0' 表示关闭）</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_配置CSLB基础数据（非SDN，基于IPv4场景+静态路由+BGP+单臂BFD方式）_zh-CN.md <span class="count block-count" data-total="2">2 条</span></h3>
+        <div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=SET BFD list_name=set_bfd_list step_id=3</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=SET BFD list_name=set_bfd_list_1 step_id=8</div>
+        </div>
+      </div><div class="file-block">
+        <h3>📄 UPCF/UPCF_静态路由（静态路由+BFD）基础数据配置实例_zh-CN.md <span class="count block-count" data-total="12">12 条</span></h3>
+        <div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_dlbdevaddr_list[0].IP 取值包含中文: '网设规划4G信令业务地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_hlbdevaddr_list[0].IP 取值包含中文: '网设规划5G信令业务地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_pmsdevaddr_list[0].IP 取值包含中文: '网设规划PMS维护业务地址'</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">examples.chinese-value</span>
+          
+          <div class="msg">examples[0].add_nfcominfo_list[0].IPENDPOINTS 取值包含中文: '[{\\"ipv6Address\\":\\"网设规划5G信令业务地址\\",\\"transport\\":\\"TCP\\",\\"port\\":8080}]'</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD IPBINDVPN list_name=add_ipbindvpn_list step_id=4</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD IPBINDVPN list_name=add_ipbindvpn_list_1 step_id=4</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD IPBINDVPN list_name=add_ipbindvpn_list_2 step_id=4</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD IPBINDVPN list_name=add_ipbindvpn_list_3 step_id=4</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=ADD IPBINDVPN list_name=add_ipbindvpn_list_4 step_id=4</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.missing-macro</span>
+          
+          <div class="msg">命令模板存在缺失宏标记（MISSING_MACRO）: command=RST POD list_name=rst_pod_list step_id=5</div>
+        </div><div class="item" data-level="INFO">
+          <span class="lv info">INFO</span>
+          <span class="rule">jinja.custom-usage</span>
+          
+          <div class="msg">feature jinja 使用自定义函数: name=getValueList</div>
+        </div><div class="item" data-level="WARNING">
+          <span class="lv warning">WARNING</span>
+          <span class="rule">jinja.getvalue-switch-semantics</span>
+          
+          <div class="msg">getValueList('DSP BFDSESSION') 变量 DSP_BFDSESSION 用于裸真值判断（{% if DSP_BFDSESSION %}）：取值 'FALSE'/'NO'/'OFF'/空 视为关闭，但 '0' 会被判为真。若需要用 '0' 表示关闭，请改为 {% if DSP_BFDSESSION and DSP_BFDSESSION != '0' %}</div>
+        </div>
+      </div>
+  <script>
+    function applyFilter(lv) {
+      document.querySelectorAll('.item').forEach(function (it) {
+        it.classList.toggle('hidden', lv !== '' && it.dataset.level !== lv);
+      });
+      document.querySelectorAll('.file-block').forEach(function (block) {
+        var visible = block.querySelectorAll('.item:not(.hidden)').length;
+        var cnt = block.querySelector('.block-count');
+        if (cnt) cnt.textContent = visible + ' 条';
+        block.classList.toggle('empty', visible === 0);
+      });
+      document.querySelectorAll('#filters .filter').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.lv === lv);
+      });
+    }
+  </script>
+</body>
+</html>
